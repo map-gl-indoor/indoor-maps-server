@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
+import { resolve as pathResolve } from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -62,10 +63,11 @@ if (argv.https) {
 if (!fs.existsSync(argv.folder)) {
     throw new Error(`{${argv.folder}} folder does not exist`);
 }
+const mapsFolder = pathResolve(argv.folder);
 
 const controller = new Controller();
-const fileWatcher = new FileWatcher(controller, argv.folder);
-const webServer = new WebServer(controller, argv.port, credentials);
+const fileWatcher = new FileWatcher(controller, mapsFolder);
+const webServer = new WebServer(controller, fileWatcher, argv.port, credentials);
 
 fileWatcher.start();
 webServer.start();

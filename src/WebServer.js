@@ -2,15 +2,12 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import express from 'express';
 import https from 'https';
-import {
-    dirname, join as pathJoin
-} from 'path';
+import { join as pathJoin } from 'path';
 import { performance } from 'perf_hooks';
-import { fileURLToPath } from 'url';
 
 import Controller from './Controller.js';
+import FileWatcher from './FileWatcher.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const MAPS_PATH = '/maps';
 const MAPS_IN_BOUNDS_PATH = '/maps-in-bounds';
 
@@ -29,11 +26,13 @@ class WebServer {
 
     /**
      * @param {Controller} controller
+     * @param {FileWatcher} fileWatcher
      * @param {number} port
      * @param {object} credentials
      */
-    constructor(controller, port, credentials) {
+    constructor(controller, fileWatcher, port, credentials) {
         this.controller = controller;
+        this.fileWatcher = fileWatcher;
         this.credentials = credentials;
         this.port = port;
     }
@@ -73,7 +72,7 @@ class WebServer {
         // Compression
         const _compression = compression();
 
-        app.use(MAPS_PATH, _compression, express.static(pathJoin(__dirname, '../maps')));
+        app.use(MAPS_PATH, _compression, express.static(this.fileWatcher.mapsFolder));
 
         app.get(pathJoin(MAPS_IN_BOUNDS_PATH, ':west,:south,:east,:north'), this._mapsInBounds);
 
