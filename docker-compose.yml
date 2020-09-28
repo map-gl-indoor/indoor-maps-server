@@ -1,0 +1,12 @@
+version: "3"
+services:
+  indoor-maps-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: indoor/indoor-maps-server
+    ports:
+    - 4001:80
+    volumes:
+    - ./maps:/maps
+

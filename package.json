@@ -1,14 +1,18 @@
 {
   "name": "indoor-maps-server",
   "version": "0.1.0",
-  "description": "",
-  "main": "server.js",
+  "description": "A server that serves geojson indoor maps",
+  "main": "src/server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mapbox-gl-indoor/indoor-maps-server"
+  },
   "scripts": {
     "lint": "eslint --quiet .",
     "start": "node src/server.js"
   },
   "type": "module",
-  "author": "",
+  "author": "Thibaud Michel",
   "license": "ISC",
   "dependencies": {
     "@turf/bbox": "^6.0.1",
