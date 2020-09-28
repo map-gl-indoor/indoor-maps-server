@@ -11,7 +11,8 @@ import { fileURLToPath } from 'url';
 import Controller from './Controller.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const MAPS_URL = 'maps';
+const MAPS_PATH = '/maps';
+const MAPS_IN_BOUNDS_PATH = '/maps-in-bounds';
 
 dotenv.config();
 
@@ -72,9 +73,9 @@ class WebServer {
         // Compression
         const _compression = compression();
 
-        app.use(`/${MAPS_URL}/`, _compression, express.static(pathJoin(__dirname, '../maps')));
+        app.use(MAPS_PATH, _compression, express.static(pathJoin(__dirname, '../maps')));
 
-        app.get('/maps-in-bounds/:west,:south,:east,:north', this._mapsInBounds);
+        app.get(pathJoin(MAPS_IN_BOUNDS_PATH, ':west,:south,:east,:north'), this._mapsInBounds);
 
         app.get('/', (req, res) => res.send('Indoor maps server'));
     }
@@ -100,7 +101,7 @@ class WebServer {
         }
 
         res.json(this.controller.findMapsInBounds(bbox).map(map => ({
-            path: req.protocol + '://' + req.get('host') + '/' + pathJoin(MAPS_URL, map.name),
+            path: pathJoin(MAPS_PATH, map.name),
             boundingBox: map.boundingBox
         })));
 
