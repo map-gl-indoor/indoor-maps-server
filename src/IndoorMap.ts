@@ -1,11 +1,8 @@
-import fs from 'fs';
-import pathLib from 'path';
-import bboxWithDefault from '@turf/bbox';
+import { readFileSync } from 'fs';
+import { basename } from 'path';
+import bboxCalc from '@turf/bbox';
 
-import { bboxOverlap } from './Utils.js';
-
-// TODO understand why we have to do that
-const bboxCalc = bboxWithDefault.default;
+import { bboxOverlap } from './Utils';
 
 class IndoorMap {
 
@@ -23,9 +20,9 @@ class IndoorMap {
         const indoorMap = new IndoorMap();
 
         indoorMap.path = path;
-        indoorMap.name = pathLib.basename(path);
+        indoorMap.name = basename(path);
 
-        const geojson = JSON.parse(fs.readFileSync(path, 'utf8'));
+        const geojson = JSON.parse(readFileSync(path, 'utf8'));
         indoorMap.boundingBox = bboxCalc(geojson);
 
         return indoorMap;

@@ -1,32 +1,26 @@
-import chokidar from 'chokidar';
-import pathLib from 'path';
+import { watch, FSWatcher } from 'chokidar';
+import { basename, join } from 'path';
 
-import Controller from './Controller.js';
+import Controller from './Controller';
 
 class FileWatcher {
 
-    /** @type {chokidar.FSWatcher} */
-    watcher;
+    private _controller: Controller;
+    private _watcher: FSWatcher;
 
-    /** @type {Controller} */
-    controller;
 
-    /** @type {String} */
-    mapsFolder;
-
-    constructor(controller, mapsFolder) {
-        this.controller = controller;
-        this.mapsFolder = mapsFolder;
+    constructor(controller: Controller) {
+        this._controller = controller;
     }
 
-    start() {
+    async start() {
         return new Promise((resolve, reject) => {
 
-            this.watcher = chokidar.watch(pathLib.join(this.mapsFolder, '/*.geojson'), {
+            this._watcher = watch(join(this._controller.mapsFolder, '/*.geojson'), {
                 ignored: /^\./,
                 persistent: true
             });
-            this.watcher
+            this._watcher
                 .on('add', path => {
                     this.addMap(path);
                 })
@@ -37,7 +31,7 @@ class FileWatcher {
                     this.removeMap(path);
                 })
                 .on('error', error => {
-                    this.error('Error happened with chokidar', error);
+                    console.error('Error happened with chokidar', error);
                     reject(error);
                 })
                 .on('ready', resolve);
@@ -45,13 +39,13 @@ class FileWatcher {
     }
 
     stop() {
-        return this.watcher.close();
+        return this._watcher.close();
     }
 
-    addMap(path) {
-        const baseName = pathLib.basename(path);
+    addMap(path: string) {
+        const baseName = basename(path);
         try {
-            this.controller.addMap(path);
+            this._controller.addMap(path);
             this.log(baseName + ' loaded');
         } catch (e) {
             this.error(baseName + ' did not load. Reason: ' + e.message);
@@ -59,21 +53,21 @@ class FileWatcher {
         }
     }
 
-    removeMap(path) {
-        const baseName = pathLib.basename(path);
+    removeMap(path: string) {
+        const baseName = basename(path);
         try {
-            this.controller.removeMap(path);
+            this._controller.removeMap(path);
             this.log(baseName + ' unloaded');
         } catch (e) {
             this.error(baseName + ' did not unload. Reason: ' + e.message);
         }
     }
 
-    log(message) {
+    log(message: string) {
         console.log('[FileWatcher] ' + message);
     }
 
-    error(message) {
+    error(message: string) {
         console.error('[FileWatcher] ' + message);
     }
 

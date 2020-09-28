@@ -1,4 +1,4 @@
-import pathLib from 'path';
+import { basename, extname } from 'path';
 
 /**
  * @param {number[]} bbox1
@@ -21,5 +21,5 @@ export function bboxOverlap(bbox1, bbox2) {
 
 
 export function getFileNameFromPath(path) {
-    return pathLib.basename(path, pathLib.extname(path));
+    return basename(path, extname(path));
 }

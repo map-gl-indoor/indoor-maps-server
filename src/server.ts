@@ -1,12 +1,11 @@
-import fs from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 
-import WebServer from './WebServer.js';
-import FileWatcher from './FileWatcher.js';
-import Controller from './Controller.js';
+import WebServer from './WebServer';
+import FileWatcher from './FileWatcher';
+import Controller from './Controller';
 
-const argv = yargs(hideBin(process.argv))
+const argv = yargs([])
     .option('folder', {
         alias: 'f',
         description: 'The maps folder',
@@ -52,17 +51,17 @@ if (argv.https) {
     }
 
     credentials = {
-        key: fs.readFileSync(keyFile, 'utf8'),
-        cert: fs.readFileSync(crtFile, 'utf8')
+        key: readFileSync(keyFile, 'utf8'),
+        cert: readFileSync(crtFile, 'utf8')
     };
 }
 
-if (!fs.existsSync(argv.folder)) {
+if (!existsSync(argv.folder)) {
     throw new Error(`{${argv.folder}} folder does not exist`);
 }
 
-const controller = new Controller();
-const fileWatcher = new FileWatcher(controller, argv.folder);
+const controller = new Controller(argv.folder);
+const fileWatcher = new FileWatcher(controller);
 const webServer = new WebServer(controller, argv.port, credentials);
 
 fileWatcher.start();

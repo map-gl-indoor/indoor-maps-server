@@ -1,30 +1,23 @@
 import compression from 'compression';
-import dotenv from 'dotenv';
-import express from 'express';
-import https from 'https';
+import { config as dotenvConfig } from 'dotenv';
+import * as express from 'express';
+import { createServer } from 'https';
 import {
-    dirname, join as pathJoin
+    join as pathJoin
 } from 'path';
 import { performance } from 'perf_hooks';
-import { fileURLToPath } from 'url';
 
-import Controller from './Controller.js';
+import Controller from './Controller';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const MAPS_URL = 'maps';
 
-dotenv.config();
+dotenvConfig();
 
 class WebServer {
 
-    /** @type {Controller} */
-    controller;
-
-    /** @type {number} */
-    port;
-
-    /** @type {object} */
-    credentials;
+    private controller: Controller
+    private port : number;
+    private credentials: object;
 
     /**
      * @param {Controller} controller
@@ -41,12 +34,12 @@ class WebServer {
         const app = express();
         let server;
         if (this.credentials) {
-            server = https.createServer(this.credentials, app);
+            server = createServer(this.credentials, app);
         } else {
             server = app;
         }
 
-        this._initRoutes(app);
+        this.initRoutes(app);
 
         server.listen(this.port);
     }
@@ -54,7 +47,7 @@ class WebServer {
     /**
      * @param {express.Application} app
      */
-    _initRoutes(app) {
+    private initRoutes(app) {
 
         // Logger
         app.use((req, _res, next) => {
